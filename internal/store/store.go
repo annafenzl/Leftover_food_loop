@@ -1,25 +1,58 @@
 package store
-
 import (
-    "sync"
+	"annafenzl/leftoverfoodloop/internal/models"
+	"sync"
 )
 
-// Local placeholder types to avoid depending on an external module during build.
-// Replace these with models.User / models.Offer / models.Request and the correct import
-// once the module path / go.mod is fixed.
-type User struct{}
-type Offer struct{}
-type Request struct{}
-
 type Store struct {
-	Users    map[string]*User
-	Offers   map[string]*Offer
-	Requests map[string]*Request
-	mu       sync.Mutex
+	// TODO: check for existing users, functions to look up phone numbers...
+	Usercount	models.UserId
+    Users    map[models.UserId]*models.User
+    Offers   map[string]*models.Offer
+    Requests map[string]*models.Request
+    mu       sync.Mutex
 }
 
 var store = &Store{
-	Users:    make(map[string]*User),
-	Offers:   make(map[string]*Offer),
-	Requests: make(map[string]*Request),
+    Users:    make(map[models.UserId]*models.User),
+    Offers:   make(map[string]*models.Offer),
+    Requests: make(map[string]*models.Request),
+}
+
+
+func AddUser(name string, address string, floor_number int, instruction string, phone_number string) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	if _, exists := store.Users[store.Usercount]; exists {
+		return 
+	}
+
+	store.Users[store.Usercount] = &models.User{
+		ID: store.Usercount,
+		PhoneNumber: phone_number,
+		FirstName: name,
+		Role: "Participant",
+		Address: address,
+		FloorNumber: floor_number,
+		PickupInstructions: instruction,
+	}
+
+	store.Usercount++
+}
+
+func AddOffer(UserId models.UserId,  ) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+
+	store.Offers[]
+
+
+	store.Usercount++
+}
+
+
+func (s *Store)Match() {
+
 }

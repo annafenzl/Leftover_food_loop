@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -11,29 +12,27 @@ const (
 	Volunteer Role = "Volunteer"
 )
 
+//go:generate go run golang.org/x/tools/cmd/stringer@latest -type=Status
 type Status int
 const (
-	available Status = iota
-	reserved
-	expired
+	Available Status = iota
+	Reserved
+	Expired
 )
 
-type UserId string
+
+type UserId int
 
 type User struct {
-	ID					UserId
-	FirstName			string
-
-	Role				Role
-	// pre registered, only people with Role Participiant need this
-	Phone_number		string
-	Address				string
-	Floor_number		int
-	Pickup_instructions	string
-
-	// do i need this circle id??
-	CircleID string
+	ID                   UserId
+	PhoneNumber          string
+	FirstName            string
+	Role                 Role
+	Address              string
+	FloorNumber          int
+	PickupInstructions   string
 }
+
 
 // how do i handle the feedback, ie we have a match, how do they know who picks up where
 type Offer struct {
@@ -55,4 +54,17 @@ type Date struct {
 type Request struct {
 	ID        UserId
 	date      Date
+	Status    Status
+}
+
+func (u User)String() string {
+	return fmt.Sprintf("%s, id %d role: %s ", u.FirstName, u.ID, u.Role)
+}
+
+func (o Offer) String() string {
+	return fmt.Sprintf("OFFER ID %s %s, %d portions, status: %s, expires at: %s", o.ID, o.Food, o.Portions, o.Status, o.ExpiresAt)
+}
+
+func (r Request) String() string {
+	return fmt.Sprintf("REQUEST ID %s, date %d %s %d, status: %s", r.ID, r.date.Year, r.date.Month, r.date.day, r.Status)
 }
