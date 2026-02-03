@@ -20,8 +20,10 @@ const (
 	Expired
 )
 
-
 type UserId int
+type OfferId int
+type RequestId int
+
 
 type User struct {
 	ID                   UserId
@@ -33,27 +35,23 @@ type User struct {
 	PickupInstructions   string
 }
 
+type Food struct {
+	Food      string
+	Portions  int
+	ExpiresAt time.Time
+}
 
 // how do i handle the feedback, ie we have a match, how do they know who picks up where
 type Offer struct {
 	ID        UserId
-	Food      string
-	Portions  int
-	ExpiresAt time.Time
-	CircleID  string
 	Status    Status
-}
-
-type Date struct {
-	Year	int
-	Month	time.Month
-	day		int
+	Food
 }
 
 // “If food becomes available nearby, someone will bring it in a reasonable time
 type Request struct {
 	ID        UserId
-	date      Date
+	Time      time.Time
 	Status    Status
 }
 

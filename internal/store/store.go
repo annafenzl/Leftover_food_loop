@@ -1,22 +1,27 @@
 package store
+
 import (
 	"annafenzl/leftoverfoodloop/internal/models"
 	"sync"
+	"time"
 )
 
 type Store struct {
-	// TODO: check for existing users, functions to look up phone numbers...
-	Usercount	models.UserId
-    Users    map[models.UserId]*models.User
-    Offers   map[string]*models.Offer
-    Requests map[string]*models.Request
-    mu       sync.Mutex
+
+	nextUserId    models.UserId
+	nextOfferId   models.OfferId
+	nextRequestId models.RequestId
+
+	Users    map[models.UserId]*models.User
+	Offers   map[models.OfferId]*models.Offer
+	Requests map[models.RequestId]*models.Request
+	mu       sync.Mutex
 }
 
 var store = &Store{
-    Users:    make(map[models.UserId]*models.User),
-    Offers:   make(map[string]*models.Offer),
-    Requests: make(map[string]*models.Request),
+	Users:    make(map[models.UserId]*models.User),
+	Offers:   make(map[models.OfferId]*models.Offer),
+	Requests: make(map[models.RequestId]*models.Request),
 }
 
 
@@ -24,12 +29,12 @@ func AddUser(name string, address string, floor_number int, instruction string, 
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	if _, exists := store.Users[store.Usercount]; exists {
+	if _, exists := store.Users[store.nextUserId]; exists {
 		return 
 	}
 
-	store.Users[store.Usercount] = &models.User{
-		ID: store.Usercount,
+	store.Users[store.nextUserId] = &models.User{
+		ID: store.nextUserId,
 		PhoneNumber: phone_number,
 		FirstName: name,
 		Role: "Participant",
@@ -38,19 +43,37 @@ func AddUser(name string, address string, floor_number int, instruction string, 
 		PickupInstructions: instruction,
 	}
 
-	store.Usercount++
+	store.nextUserId++
 }
 
-func AddOffer(UserId models.UserId,  ) {
+func AddOffer(UserId models.UserId, food models.Food) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
+	store.Offers[store.nextOfferId] = &models.Offer{
+		ID: UserId,
+		Status: models.Available,
+		Food: food,
+	}
 
-	store.Offers[]
-
-
-	store.Usercount++
+	store.nextOfferId++
 }
+
+
+func AddRequest(UserId models.UserId) {
+
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	store.Requests[store.nextRequestId] = &models.Request{
+		ID: UserId,
+		Time: time.Now(),
+		Status: models.Available,
+	}
+
+	store.nextRequestId++
+}
+
 
 
 func (s *Store)Match() {
