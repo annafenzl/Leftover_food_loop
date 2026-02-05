@@ -1,7 +1,6 @@
 package server
 
 import (
-	"annafenzl/leftoverfoodloop/internal/models"
 	"annafenzl/leftoverfoodloop/internal/store"
 	"fmt"
 	"log"
@@ -35,7 +34,7 @@ func OfferFood(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, " %s portions of %s\n", portions, food_type)
 }
 
-// same here, if the user is an elder you can put the address equivalent to the phone number
+// when you call to request food, then you get all the available offers
 func RequestFood(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/request" {
 	http.Error(w, "404 not found.", http.StatusNotFound)
@@ -55,7 +54,7 @@ func RequestFood(w http.ResponseWriter, r *http.Request) {
 }
 
 //TODO: error handling
-func Add_User(w http.ResponseWriter, r *http.Request) {
+func AddUser(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		fmt.Fprintf(w, "ParseForm() err: %v", err)
 		return 
@@ -70,7 +69,7 @@ func Add_User(w http.ResponseWriter, r *http.Request) {
 	instruction := r.FormValue("instructionss")
 	phone_number := r.FormValue("phone_number")
 
-	store.AddUser(name, address, floor_number, instruction, phone_number)
+	store.AddVolunteer(name, address, floor_number, instruction, phone_number)
 
 }
 
@@ -81,7 +80,7 @@ func Start() {
     http.Handle("/", fileServer) 
 
 	// Func to Add User
-	http.HandleFunc("/addUser", Add_User)
+	http.HandleFunc("/addUser", AddUser)
 	
 	// Func to Post Food
 	http.HandleFunc("/request", RequestFood)

@@ -25,7 +25,27 @@ var store = &Store{
 }
 
 
-func AddUser(name string, address string, floor_number int, instruction string, phone_number string) {
+func AddParticipant(name string, address string, floor_number int, instruction string, phone_number string) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	if _, exists := store.Users[store.nextUserId]; exists {
+		return 
+	}
+
+	// TODO: add preferences
+	store.Users[store.nextUserId] = &models.User{
+		ID: store.nextUserId,
+		PhoneNumber: phone_number,
+		FirstName: name,
+		Address: address,
+		FloorNumber: floor_number,
+		PickupInstructions: instruction,
+	}
+	store.nextUserId++
+}
+
+func AddVolunteer(name string, address string, floor_number int, instruction string, phone_number string) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
@@ -37,14 +57,13 @@ func AddUser(name string, address string, floor_number int, instruction string, 
 		ID: store.nextUserId,
 		PhoneNumber: phone_number,
 		FirstName: name,
-		Role: "Participant",
 		Address: address,
 		FloorNumber: floor_number,
 		PickupInstructions: instruction,
 	}
-
 	store.nextUserId++
 }
+
 
 func AddOffer(UserId models.UserId, food models.Food) {
 	store.mu.Lock()
@@ -59,7 +78,6 @@ func AddOffer(UserId models.UserId, food models.Food) {
 	store.nextOfferId++
 }
 
-
 func AddRequest(UserId models.UserId) {
 
 	store.mu.Lock()
@@ -73,8 +91,6 @@ func AddRequest(UserId models.UserId) {
 
 	store.nextRequestId++
 }
-
-
 
 func (s *Store)Match() {
 
